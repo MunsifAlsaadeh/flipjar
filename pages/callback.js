@@ -3,18 +3,21 @@ import { useRouter } from 'next/router'
 import { supabase } from '../../lib/supabase'
 
 export default function Callback() {
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
-    // This completes the magic link login and redirects home
-    supabase.auth
-      .getSessionFromUrl()
-      .then(() => router.replace('/'))
-      .catch((err) => {
-        console.error('Login error:', err)
-        router.replace('/login') // fallback
-      })
+    const handleLogin = async () => {
+      const { error } = await supabase.auth.exchangeCodeForSession(window.location.href);
+      if (error) {
+        console.error('Login failed:', error.message)
+        router.replace('/login')
+      } else {
+        router.replace('/')
+      }
+    }
+
+    handleLogin();
   }, [router])
 
-  return <p>Logging you in...</p>
+  return <p>Completing login...</p>
 }
