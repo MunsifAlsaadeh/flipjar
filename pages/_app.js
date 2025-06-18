@@ -1,29 +1,11 @@
-import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
+import { AuthProvider } from '../lib/AuthProvider'
 
 function MyApp({ Component, pageProps }) {
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        setLoading(false)
-        window.location.href = '/'
-      }
-    })
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setLoading(false)
-    })
-
-    return () => {
-      listener?.subscription.unsubscribe()
-    }
-  }, [])
-
-  if (loading) return <p>Loading session...</p>
-
-  return <Component {...pageProps} />
+  return (
+    <AuthProvider>
+      <Component {...pageProps} />
+    </AuthProvider>
+  )
 }
 
 export default MyApp
