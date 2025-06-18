@@ -1,19 +1,27 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
 function MyApp({ Component, pageProps }) {
+  const [loading, setLoading] = useState(true)
+
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        supabase.auth.onAuthStateChange((_event, session) => {
-          if (session) {
-            // Optional: store in localStorage or context
-            window.location.reload()
-          }
-        })
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        setLoading(false)
+        window.location.href = '/'
       }
     })
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setLoading(false)
+    })
+
+    return () => {
+      listener?.subscription.unsubscribe()
+    }
   }, [])
+
+  if (loading) return <p>Loading session...</p>
 
   return <Component {...pageProps} />
 }
