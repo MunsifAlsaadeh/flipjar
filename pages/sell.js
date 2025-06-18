@@ -1,6 +1,22 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../lib/AuthProvider'
+
+export default function SellPage() {
+  const { user, loading } = useAuth()
+
+  if (loading) return <p>Loading...</p>
+  if (!user) return <p>Please login to sell items</p>
+
+  return (
+    <div>
+      <h1>List a Product</h1>
+      {/* Your listing form goes here */}
+    </div>
+  )
+}
+
 
 export default function Sell() {
   const [title, setTitle] = useState('')
